@@ -5,20 +5,16 @@
 class Int128
 {
 private:
-    std::bitset<128> m_data;
-    friend Int128 div_mod(Int128 a, Int128 b, bool is_div);
-    uint64_t get_64bit(int pos) const;
-    bool less_unsigned(const Int128 & value) const;
-    size_t count_sig_bits() const;
+    std::int64_t m_high = 0;
+    std::uint64_t m_low = 0;
 
-    static Int128 ONE;
-    static Int128 ZERO;
-    static Int128 M_ONE;
-    static Int128 TEN;
+    friend std::pair<Int128, Int128> div_mod(Int128 left, Int128 right);
+    std::uint64_t get_64bit(int pos) const;
+    bool less_unsigned(const Int128 & value) const;
+    static std::size_t find_msb(Int128 value);
 
 public:
-    Int128() = default;
-    Int128(const std::bitset<128> & mData);
+    Int128();
     Int128(std::int64_t value);
     Int128(std::string_view value);
 
@@ -33,6 +29,12 @@ public:
     friend bool operator>(const Int128 & lhs, const Int128 & rhs);
     friend bool operator<=(const Int128 & lhs, const Int128 & rhs);
     friend bool operator>=(const Int128 & lhs, const Int128 & rhs);
+
+    friend Int128 operator<<(const Int128 & lhs, std::size_t rhs);
+    Int128 & operator<<=(std::size_t rhs);
+
+    friend Int128 operator>>(const Int128 & lhs, std::size_t rhs);
+    Int128 & operator>>=(std::size_t rhs);
 
     friend std::ostream & operator<<(std::ostream & os, const Int128 & value);
 
