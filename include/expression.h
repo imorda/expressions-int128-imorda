@@ -59,53 +59,20 @@ protected:
     virtual std::string op_symbol() const = 0;
 };
 
-class Add : public BinaryExpression
-{
-public:
-    Add(const Expression & m_left, const Expression & m_right);
-    Add(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & mRight);
-    Int128 eval(const std::map<std::string, Int128> & values = {}) const override;
-    Expression * clone() const override;
-
-protected:
-    std::string op_symbol() const override;
-};
-
-class Subtract : public BinaryExpression
-{
-public:
-    Subtract(const Expression & m_left, const Expression & m_right);
-    Subtract(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & mRight);
-    Int128 eval(const std::map<std::string, Int128> & values = {}) const override;
-    Expression * clone() const override;
-
-protected:
-    std::string op_symbol() const override;
-};
-
-class Divide : public BinaryExpression
-{
-public:
-    Divide(const Expression & m_left, const Expression & m_right);
-    Divide(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & mRight);
-    Int128 eval(const std::map<std::string, Int128> & values = {}) const override;
-    Expression * clone() const override;
-
-protected:
-    std::string op_symbol() const override;
-};
-
-class Multiply : public BinaryExpression
-{
-public:
-    Multiply(const Expression & m_left, const Expression & m_right);
-    Multiply(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & mRight);
-    Int128 eval(const std::map<std::string, Int128> & values = {}) const override;
-    Expression * clone() const override;
-
-protected:
-    std::string op_symbol() const override;
-};
+#define BIN_EXPR(Name, OP)                                                                             \
+    class Name : public BinaryExpression                                                               \
+    {                                                                                                  \
+    public:                                                                                            \
+        Name(const Expression & m_left, const Expression & m_right);                                   \
+        Name(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right); \
+        Int128 eval(const std::map<std::string, Int128> & values = {}) const override;                 \
+        Expression * clone() const override;                                                           \
+                                                                                                       \
+    protected:                                                                                         \
+        std::string op_symbol() const override;                                                        \
+    };                                                                                                 \
+    Name operator OP(const Expression & a, const Expression & b);
+#include "bin_exprs.inl"
 
 class Negate : public Expression
 {
@@ -119,8 +86,4 @@ public:
     Negate(const std::shared_ptr<Expression> & m_value);
     Negate(const Expression & m_value);
 };
-Multiply operator*(const Expression & a, const Expression & b);
 Negate operator-(const Expression & value);
-Divide operator/(const Expression & a, const Expression & b);
-Subtract operator-(const Expression & a, const Expression & b);
-Add operator+(const Expression & a, const Expression & b);

@@ -52,90 +52,6 @@ std::string BinaryExpression::str() const
     return "(" + m_left->str() + " " + op_symbol() + " " + m_right->str() + ")";
 }
 
-Add::Add(const Expression & m_left, const Expression & m_right)
-    : BinaryExpression(m_left.clone(), m_right.clone())
-{
-}
-Add::Add(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right)
-    : BinaryExpression(m_left, m_right)
-{
-}
-Int128 Add::eval(const std::map<std::string, Int128> & values) const
-{
-    return m_left->eval(values) + m_right->eval(values);
-}
-Expression * Add::clone() const
-{
-    return new Add(m_left, m_right);
-}
-std::string Add::op_symbol() const
-{
-    return "+";
-}
-
-Subtract::Subtract(const Expression & m_left, const Expression & m_right)
-    : BinaryExpression(m_left.clone(), m_right.clone())
-{
-}
-Subtract::Subtract(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right)
-    : BinaryExpression(m_left, m_right)
-{
-}
-Int128 Subtract::eval(const std::map<std::string, Int128> & values) const
-{
-    return m_left->eval(values) - m_right->eval(values);
-}
-Expression * Subtract::clone() const
-{
-    return new Subtract(m_left, m_right);
-}
-std::string Subtract::op_symbol() const
-{
-    return "-";
-}
-
-Divide::Divide(const Expression & m_left, const Expression & m_right)
-    : BinaryExpression(m_left.clone(), m_right.clone())
-{
-}
-Divide::Divide(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right)
-    : BinaryExpression(m_left, m_right)
-{
-}
-Int128 Divide::eval(const std::map<std::string, Int128> & values) const
-{
-    return m_left->eval(values) / m_right->eval(values);
-}
-Expression * Divide::clone() const
-{
-    return new Divide(m_left, m_right);
-}
-std::string Divide::op_symbol() const
-{
-    return "/";
-}
-
-Multiply::Multiply(const Expression & m_left, const Expression & m_right)
-    : BinaryExpression(m_left.clone(), m_right.clone())
-{
-}
-Multiply::Multiply(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right)
-    : BinaryExpression(m_left, m_right)
-{
-}
-Int128 Multiply::eval(const std::map<std::string, Int128> & values) const
-{
-    return m_left->eval(values) * m_right->eval(values);
-}
-Expression * Multiply::clone() const
-{
-    return new Multiply(m_left, m_right);
-}
-std::string Multiply::op_symbol() const
-{
-    return "*";
-}
-
 Negate::Negate(const std::shared_ptr<Expression> & m_value)
     : m_value(m_value)
 {
@@ -156,24 +72,33 @@ Negate::Negate(const Expression & m_value)
     : m_value(m_value.clone())
 {
 }
-
-Add operator+(const Expression & a, const Expression & b)
-{
-    return Add(a, b);
-}
-Subtract operator-(const Expression & a, const Expression & b)
-{
-    return Subtract(a, b);
-}
 Negate operator-(const Expression & val)
 {
     return Negate(val);
 }
-Multiply operator*(const Expression & a, const Expression & b)
-{
-    return Multiply(a, b);
-}
-Divide operator/(const Expression & a, const Expression & b)
-{
-    return Divide(a, b);
-}
+#define BIN_EXPR(Name, OP)                                                                              \
+    Name::Name(const Expression & m_left, const Expression & m_right)                                   \
+        : BinaryExpression(m_left.clone(), m_right.clone())                                             \
+    {                                                                                                   \
+    }                                                                                                   \
+    Name::Name(const std::shared_ptr<Expression> & m_left, const std::shared_ptr<Expression> & m_right) \
+        : BinaryExpression(m_left, m_right)                                                             \
+    {                                                                                                   \
+    }                                                                                                   \
+    Int128 Name::eval(const std::map<std::string, Int128> & values) const                               \
+    {                                                                                                   \
+        return m_left->eval(values) OP m_right->eval(values);                                           \
+    }                                                                                                   \
+    Expression * Name::clone() const                                                                    \
+    {                                                                                                   \
+        return new Name(m_left, m_right);                                                               \
+    }                                                                                                   \
+    std::string Name::op_symbol() const                                                                 \
+    {                                                                                                   \
+        return #OP;                                                                                     \
+    }                                                                                                   \
+    Name operator OP(const Expression & a, const Expression & b)                                        \
+    {                                                                                                   \
+        return Name(a, b);                                                                              \
+    }
+#include "bin_exprs.inl"
